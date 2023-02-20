@@ -20,11 +20,27 @@
           </p>
           
           <h2 style="text-align:center;">Task 2: </h2>
-          <p style="text-align:center;"> </p>
-          
+          <p style="text-align:center;">
+            Similar to Task 1, we first iterated pixel by pixel. We sampled evenly distrubited points (as determined by variable sample_rate) in the pixel and appended its color to sample_buffer array. 
+            To populate frame_buffer array, we took the average of the colors of its sampled points for each pixel. 
+            To ensure pixels that make up points and lines are not affected by supersampling, we modified fill_pixel to populate all its corresponding sample points with the same color.
+            Supersampling is an anti-alising method that helps to prevent "jaggies" - jagged lines at color boundaries. It softens the edges of triangles by giving those pixels a lighter shade.
+            </p>
+            <div style="text-align:center;">
+                <img src="task2-1.png" width="650" height="300" alt="Task 2 1">
+                <p style="text-align:center;"> ^ The edges of the triangles look like staircases because we only sampled the center of each pixel, hence pixels that only contain part of the edges may not have filled, leading to jaggies! </p>
+            </div>
+            <div style="text-align:center;">
+                <img src="task2-4.png" width="650" height="300" alt="Task 2 4">
+                <p style="text-align:center;"> ^ The edges of the triangles look like smoother because we sampled 4 times every pixel and took the average of the colors, hence pixels that only contain part of the edges has a lighter shade! </p>
+            </div>
+            <div style="text-align:center;">
+                <img src="task2-16.png" width="650" height="300" alt="Task 2 16">
+                <p style="text-align:center;"> ^ The edges of the triangles look like the smooithest! because we sampled 16 times every pixel and took the average of the colors, hence pixels that only contain part of the edges has a lighter shade! </p>
+            </div>            
           <h2 style="text-align:center;">Task 3: </h2>
           <p style="text-align:center;">
-          I did not encounter any problems other than figuring out which syntax to use for these functions.
+          We did not encounter any problems other than figuring out which syntax to use for these functions.
           <br>
           Cubeman is now a cool robot with a flashy hairstyle. He is running away from all adoring fans.
           <br>
@@ -48,15 +64,60 @@
               <br>
               <br>
           <h2 style="text-align:center;">Task 5: </h2>
-          <p style="text-align:center;">Pixel sampling is when we evaluate a pixel with a function. We had to compute the barycentric coordinates in order to obtain the varying texture coordinates for our texture mapping. The texture coordinates were used to calculate the uv vector we needed to get a specific point of a triangle within the image. We implemented pixel sampling to perform texture mapping by attaining each pixel and deciding on whether we had to plug it into the nearest or the bilinear sampling method based on the psm (pixelSampleMethhod) attribute. The output of our evaluated input was a color which we then plugged into the fill_pixel method for each pixel. The difference between the nearest sampling method and the bilinear sampling method is that nearest is best used for categorical data such as land-use classification or slope classification. The values that go in the grid remain the same. The value of the output cell is determined by the nearest cell center on the input grid; whereas bilinear uses a weighted average of the four nearest cell centers. The closer an input cell center is to the output cell center, the higher the influence of its value is on the output cell value. This means that the output value could be different than the nearest input, but is always within the same range of values as the input.
-          
-              In the beginning, we struggled with conceptual problems such as how to calculate the desireed uv vector. Going to office hours helped clear any uncertainty.
-          </p>
-          <!--bilinear and nearest source: "https://support.esri.com/en/technical-article/000005606" -->
-          
+          <p style="text-align:center;">
+            Pixel Sampling is a process where we evalulate a pixel, in this case, we are trying to map a texture onto a surface.
+            We first computed the barycentric coordinates of each sampled point, we then calculated the uv vector using the barycentric coordinates as the weighted sum of the vertices.
+            Then we scaled u by width of the texture - 1 and v by height of the texture -1. (we had to minus 1 to account for zero indexing). This gives us the texture coordinate corresponding to the sampled point.
+           
+            For nearest pixel sampling, We rounded the texture coorindate to a whole number, such that it maps to 1 pixel. We then assigned the color of that pixel to the sample point.
+
+            For bilinear sampling, we found the 4 pixels that surrounded the texture coordinate. We then did linear interpolation twice on the colors of those pixels to figure out the exact color of the sample point.
+
+            The color of the sample point was appened to sample buffer, and processed similiarly to Task 2.
+            <div style="text-align:center;">
+                <img src="task5-bilinear-1.png" width="650" height="300" alt="Task 5 1">
+                <img src="task5-nearest-1.png" width="650" height="300" alt="Task 5 11">
+            </div>  
+            <div style="text-align:center;">
+                <img src="task5-bilinear-16.png" width="650" height="300" alt="Task 5 16">
+                <img src="task5-nearest-16.png" width="650" height="300" alt="Task 5 16">
+            </div>  
+            <p style="text-align:center;">TL: bilinear with 1 sample / pixel, TR: nearest with 1 sample / pixel </p>
+            <p style="text-align:center;">BL: bilinear with 16 samples / pixel, BR: nearest with 16 samples / pixel </p>
+            <p style="text-align:center;"> 
+                The difference between bilinear sampling and nearest sampling with 1 sample per pixel is huge! 
+                The effect is especially obivious at maginifed areas where pixels have already been dropped due to warping. 
+                Nearest sampling further exacerbates this problem yielding discontinuties in lines. 
+                The difference is less obvious when we have more sampels per pixel. Supersampling already does a pertty good job at 
+                picking up details, hence the bilinear interpolation wasn't very useful.
+            </p>
+
+
+        </p>
           <h2 style="text-align:center;">Task 6: </h2>
-          <p style="text-align:center;"> </p>
+          <p style="text-align:center;">
+            To carry out level sampling, we calculated the barycentric coordinates of (x+1,y) and (x,y+1) 
+            and passed their corresponding texel coordinate into the sample method where we computed du/dx, dv/dv/ du/dv and dv/dy. 
+            Using the equation on the lecture slide, we calculated D. For nearest sampling, 
+            we simply rounded D off and scaled uv according to the size of D to figure out the textual coordinates.
+            For linear sampling, we found the textual coordinates corresponding to ceil(D) and floor(D) and carried out linear interpolation.
+            Bilinear sampling for both levels and pixels increase memory usuage and reduce speed due to extra computation requited for linear interpolation. However, it helps
+            with anti-alising due to its averaging effect. Supersampling also takes up more memory and space, however, we can code supersamplign to not take up as much space but not storing all the sampled point. However this may 
+            decrease speed due to our inability to parrallelise our program.
+        </p>
+
+        <div style="text-align:center;">
+            <img src="task6-nl-np.png" width="650" height="300" alt="Task 5 1">
+            <img src="task6-nl-bp.png" width="650" height="300" alt="Task 5 11">
+        </div>  
+        <div style="text-align:center;">
+            <img src="task6-bl-np.png" width="650" height="300" alt="Task 5 16">
+            <img src="task6-bl-bp.png" width="650" height="300" alt="Task 5 16">
+        </div>  
+        <p style="text-align:center;">TL: nearest level +  nearest pixel, TR: nearest level +  bilinear pixel </p>
+        <p style="text-align:center;">BL: bilinear level +  nearest pixel, BR: bilinear level +  bilinear pixel </p>
         
+    
         
 	</body>
 </html>
