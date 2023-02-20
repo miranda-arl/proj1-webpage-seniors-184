@@ -5,13 +5,11 @@
     <!--An overview of the project, your approach to and implementation for each of the parts, and what problems you encountered and how you solved them. Strive for clarity and succinctness.-->
 	<body>
           <h2 style="text-align:center;">Task 1: </h2>
-          <p style="text-align:center;">We were able to rasterize triangles by calculating the differences between all of the adjacent points on each triangle and performing the three line test to check whether or not a pixel in the image was indeed inside a triangle. If it was inside the triangle, or even on the edge, then we filled in the pixel with the fill_pixel function.
+          <p style="text-align:center;">We were able to rasterize triangles by calculating the differences between all of the adjacent points on each triangle and performing the three line test to check whether or not a pixel in the image was indeed inside a triangle. 
+            If it was inside the triangle, or even on the edge, then we filled in the pixel with the fill_pixel function.
           
-              Our algorithm is no worse than one that checks each sample within the bounding box of the triangle because that was my first approach. We have further optimized this approach as discussed in the Special Optimizations section below.
+              Our algorithm is no worse than one that checks each sample within the bounding box of the triangle because we iterated through each pixel one at a time!
           </p>
-          <br>
-          <br>
-          <h2 style="text-align:center;">Special Optimizations</h2>
           
           <p style="text-align:center;">
           <br>
